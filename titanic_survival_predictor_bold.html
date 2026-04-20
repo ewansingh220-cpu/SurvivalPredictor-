@@ -1,0 +1,209 @@
+
+<h2 class="sr-only">Titanic survival predictor — enter passenger details to predict survival odds</h2>
+<style>
+.panel{background:#0C447C;border-radius:16px;padding:1.5rem;margin-bottom:12px}
+.panel-coral{background:#993C1D}
+.panel-purple{background:#534AB7}
+.lbl{font-size:11px;font-weight:500;letter-spacing:.06em;color:rgba(255,255,255,.65);text-transform:uppercase;margin:0 0 8px}
+.val{font-size:22px;font-weight:500;color:#fff;margin:0}
+.chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500}
+select,input[type=range]{width:100%}
+select{background:#fff;color:#0C447C;border:none;border-radius:8px;padding:8px 10px;font-size:14px;font-weight:500;cursor:pointer}
+.track-wrap{background:rgba(255,255,255,.2);border-radius:4px;height:6px;margin:8px 0 4px;position:relative}
+.track-fill{height:6px;border-radius:4px;background:#FAC775;position:absolute;left:0;top:0;transition:width .2s}
+.range-num{color:#fff;font-size:15px;font-weight:500}
+.result-wrap{border-radius:16px;padding:1.5rem;margin-bottom:12px}
+.survived-bg{background:#3B6D11}
+.dead-bg{background:#A32D2D}
+.prob-track{background:rgba(255,255,255,.2);border-radius:6px;height:10px;overflow:hidden;margin:10px 0}
+.prob-fill{height:10px;border-radius:6px;transition:width .5s ease}
+.factor-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.factor-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.predict-btn{width:100%;padding:14px;font-size:15px;font-weight:500;border:none;border-radius:12px;background:#EF9F27;color:#412402;cursor:pointer;letter-spacing:.02em}
+.predict-btn:active{opacity:.85}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:#7F77DD;border-radius:20px;padding:5px 14px;margin-bottom:16px}
+</style>
+
+<div style="padding:0.5rem 0">
+
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+  <div style="width:48px;height:48px;border-radius:12px;background:#0C447C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FAC775" stroke-width="2" stroke-linecap="round"><path d="M2 20h20M4 20V10l8-8 8 8v10"/><path d="M9 20v-6h6v6"/></svg>
+  </div>
+  <div>
+    <p style="font-size:20px;font-weight:500;margin:0;color:var(--color-text-primary)">Titanic survival predictor</p>
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:0">Logistic regression · 5 features</p>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px">
+  <div class="panel">
+    <p class="lbl">Passenger class</p>
+    <select id="pclass">
+      <option value="1">1st class</option>
+      <option value="2">2nd class</option>
+      <option value="3" selected>3rd class</option>
+    </select>
+  </div>
+  <div class="panel panel-coral">
+    <p class="lbl">Sex</p>
+    <select id="sex">
+      <option value="female">Female</option>
+      <option value="male" selected>Male</option>
+    </select>
+  </div>
+</div>
+
+<div class="panel panel-purple" style="margin-bottom:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <p class="lbl" style="margin:0">Age</p>
+    <span class="range-num" id="age-out">30</span>
+  </div>
+  <div class="track-wrap">
+    <div class="track-fill" id="age-fill" style="width:36%"></div>
+  </div>
+  <input type="range" id="age" min="1" max="80" value="30" step="1" style="opacity:0;height:6px;margin-top:-10px;cursor:pointer">
+  <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:rgba(255,255,255,.5)">1</span><span style="font-size:11px;color:rgba(255,255,255,.5)">80</span></div>
+</div>
+
+<div class="panel" style="margin-bottom:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <p class="lbl" style="margin:0">Fare</p>
+    <span class="range-num" id="fare-out">£32</span>
+  </div>
+  <div class="track-wrap">
+    <div class="track-fill" id="fare-fill" style="width:6%"></div>
+  </div>
+  <input type="range" id="fare" min="0" max="512" value="32" step="1" style="opacity:0;height:6px;margin-top:-10px;cursor:pointer">
+  <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:rgba(255,255,255,.5)">£0</span><span style="font-size:11px;color:rgba(255,255,255,.5)">£512</span></div>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:16px">
+  <div class="panel panel-coral">
+    <p class="lbl">Siblings / spouse</p>
+    <select id="sibsp">
+      <option value="0" selected>0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3+</option>
+    </select>
+  </div>
+  <div class="panel panel-purple">
+    <p class="lbl">Parents / children</p>
+    <select id="parch">
+      <option value="0" selected>0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3+</option>
+    </select>
+  </div>
+</div>
+
+<button class="predict-btn" onclick="predict()">Predict survival</button>
+
+<div id="result-box" style="display:none;margin-top:12px">
+  <div id="result-card" class="result-wrap">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div id="res-icon" style="width:52px;height:52px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg id="res-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline id="res-check" points="20 6 9 17 4 12" style="display:none"/><line id="res-x1" x1="18" y1="6" x2="6" y2="18" style="display:none"/><line id="res-x2" x1="6" y1="6" x2="18" y2="18" style="display:none"/></svg>
+      </div>
+      <div>
+        <p id="res-label" style="font-size:20px;font-weight:500;color:#fff;margin:0"></p>
+        <p id="res-conf" style="font-size:13px;color:rgba(255,255,255,.7);margin:0"></p>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:rgba(255,255,255,.6);margin:0 0 4px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Survival probability</p>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="prob-track" style="flex:1">
+        <div id="prob-fill" class="prob-fill"></div>
+      </div>
+      <span id="pct-num" style="font-size:18px;font-weight:500;color:#fff;min-width:42px;text-align:right"></span>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:12px;margin-top:4px">
+      <p style="font-size:11px;font-weight:500;letter-spacing:.06em;color:rgba(255,255,255,.55);text-transform:uppercase;margin:0 0 10px">Key factors</p>
+      <div id="factors"></div>
+    </div>
+  </div>
+</div>
+
+<p style="font-size:11px;color:var(--color-text-tertiary);text-align:center;margin-top:10px">Educational model · Trained on Titanic historical data</p>
+</div>
+
+<script>
+function sigmoid(x){return 1/(1+Math.exp(-x))}
+
+function syncRange(inputId,fillId,outId,fmt){
+  const el=document.getElementById(inputId);
+  const fill=document.getElementById(fillId);
+  const out=document.getElementById(outId);
+  const min=+el.min,max=+el.max;
+  function upd(){
+    const pct=((+el.value-min)/(max-min)*100).toFixed(1);
+    fill.style.width=pct+'%';
+    out.textContent=fmt(+el.value);
+  }
+  el.oninput=upd;
+  upd();
+}
+syncRange('age','age-fill','age-out',v=>v);
+syncRange('fare','fare-fill','fare-out',v=>'£'+v);
+
+function predict(){
+  const pclass=+document.getElementById('pclass').value;
+  const sex=document.getElementById('sex').value;
+  const age=+document.getElementById('age').value;
+  const fare=+document.getElementById('fare').value;
+  const sibsp=+document.getElementById('sibsp').value;
+  const parch=+document.getElementById('parch').value;
+
+  const sexMale=sex==='male'?1:0;
+  const p2=pclass===2?1:0,p3=pclass===3?1:0;
+  const aN=(age-29.7)/14.5;
+  const fN=(Math.log(fare+1)-2.9)/1.5;
+  const fam=sibsp+parch;
+  const logit=1.52-2.45*sexMale-0.58*p2-1.25*p3-0.38*aN+0.22*fN-0.20*fam+0.35*(sex==='female'&&pclass===1?1:0)+0.18*(age<15?1:0);
+  const prob=sigmoid(logit);
+  const survived=prob>=0.5;
+  const pct=Math.round(prob*100);
+  const conf=Math.round(survived?prob*100:(1-prob)*100);
+
+  const box=document.getElementById('result-box');
+  const card=document.getElementById('result-card');
+  box.style.display='block';
+  card.className='result-wrap '+(survived?'survived-bg':'dead-bg');
+
+  document.getElementById('res-label').textContent=survived?'Likely survived':'Did not survive';
+  document.getElementById('res-conf').textContent='Model confidence: '+conf+'%';
+  document.getElementById('res-check').style.display=survived?'':'none';
+  document.getElementById('res-x1').style.display=survived?'none':'';
+  document.getElementById('res-x2').style.display=survived?'none':'';
+
+  document.getElementById('pct-num').textContent=pct+'%';
+  const pf=document.getElementById('prob-fill');
+  pf.style.width=pct+'%';
+  pf.style.background=survived?'#97C459':'#F09595';
+
+  const factors=[];
+  if(sexMale) factors.push({t:'Male sex',n:'Strongest negative factor',pos:false});
+  else factors.push({t:'Female sex',n:'Strongest positive factor',pos:true});
+  if(pclass===1) factors.push({t:'1st class',n:'Higher lifeboat priority',pos:true});
+  if(pclass===3) factors.push({t:'3rd class',n:'Lower lifeboat access',pos:false});
+  if(age<15) factors.push({t:'Child passenger',n:'Evacuated first',pos:true});
+  if(age>60) factors.push({t:'Older passenger',n:'Slight disadvantage',pos:false});
+  if(fare>100) factors.push({t:'High fare',n:'Better deck position',pos:true});
+  if(fam>3) factors.push({t:'Large family',n:'Harder to evacuate together',pos:false});
+
+  document.getElementById('factors').innerHTML=factors.slice(0,4).map(f=>`
+    <div class="factor-row">
+      <div class="factor-dot" style="background:${f.pos?'#97C459':'#F09595'}"></div>
+      <div>
+        <span style="font-size:13px;font-weight:500;color:#fff">${f.t}</span>
+        <span style="font-size:12px;color:rgba(255,255,255,.65)"> — ${f.n}</span>
+      </div>
+    </div>`).join('');
+
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
